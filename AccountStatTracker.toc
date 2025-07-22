@@ -1,0 +1,14 @@
+## Interface: 11503
+## Title: Account Stat Tracker
+## Notes: A Hardcore-focused stat tracker with a minimap icon and session tracking.
+## SavedVariables: AST_DB
+
+# Libraries (Must be loaded first)
+Libs\LibStub.lua
+Libs\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0.lua
+
+# Core Addon Files
+AccountStatTracker.xml
+AccountStatTracker.lua
