@@ -186,6 +186,60 @@ function addon:RefreshVisiblePanels()
 end
 
 ---------------------------------
+-- FLEX FUNCTIONS (Added back)
+---------------------------------
+
+function addon:FlexStat(statType)
+    local message = "["..addonName.."] "
+    local charDB = GetCharacterDB()
+    if not charDB then return end
+
+    if statType == "ACC_XP" then message = message .. "Across all my characters, I have gained " .. (AST_DB.profile.totalXP or 0) .. " total XP!"
+    elseif statType == "ACC_QUESTS" then message = message .. "Across all my characters, I have completed " .. (AST_DB.profile.totalQuests or 0) .. " quests!"
+    elseif statType == "ACC_DEATHS" then message = message .. "Across all my characters, I have suffered " .. (AST_DB.profile.totalDeaths or 0) .. " deaths!"
+    elseif statType == "ACC_GOLD" then message = message .. "Across all my characters, I have earned " .. FormatMoney(AST_DB.profile.totalMoneyGained or 0) .. "!"
+    elseif statType == "CHAR_XP" then message = message .. "I have gained " .. (charDB.xpGained or 0) .. " XP on this character!"
+    elseif statType == "CHAR_QUESTS" then message = message .. "I have completed " .. (charDB.quests or 0) .. " quests on this character!"
+    elseif statType == "CHAR_GOLD" then message = message .. "I have earned " .. FormatMoney(charDB.moneyGained or 0) .. " on this character!"
+    elseif statType == "CHAR_TIME" then message = message .. "My total time played is " .. FormatTime(charDB.totalTimePlayed or 0) .. "!"
+    end
+    ChatFrame_OpenChat(message)
+end
+
+local private_menuList = {}
+local function DropDown_Initialize(frame)
+    local info = UIDropDownMenu_CreateInfo()
+    for _, value in ipairs(private_menuList) do
+        info.text = value.text
+        info.func = value.func
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+function addon:ToggleDropDownMenu(button, menuType)
+    if menuType == "ACCOUNT" then
+        private_menuList = {
+            {text = "Total XP Gained", func = function() addon:FlexStat("ACC_XP") end},
+            {text = "Total Quests", func = function() addon:FlexStat("ACC_QUESTS") end},
+            {text = "Total Deaths", func = function() addon:FlexStat("ACC_DEATHS") end},
+            {text = "Total Gold Earned", func = function() addon:FlexStat("ACC_GOLD") end},
+        }
+    elseif menuType == "CHARACTER" then
+        private_menuList = {
+            {text = "Character XP Gained", func = function() addon:FlexStat("CHAR_XP") end},
+            {text = "Character Quests", func = function() addon:FlexStat("CHAR_QUESTS") end},
+            {text = "Character Gold", func = function() addon:FlexStat("CHAR_GOLD") end},
+            {text = "Character Time Played", func = function() addon:FlexStat("CHAR_TIME") end},
+        }
+    else
+        private_menuList = {}
+    end
+    UIDropDownMenu_Initialize(AST_DropDownMenu, DropDown_Initialize)
+    ToggleDropDownMenu(1, nil, AST_DropDownMenu, button, 0, 0)
+end
+
+
+---------------------------------
 -- PANEL UPDATE FUNCTIONS
 ---------------------------------
 
@@ -389,7 +443,6 @@ local function InitializeMinimapButton()
             tooltip:AddLine("Account Stat Tracker"); tooltip:AddLine("|cffeda55fClick|r to open.")
         end
     }
-    -- CORRECTED: The function to register a data object is NewDataObject, not Register
     LDB:NewDataObject(addonName, ldbObject)
     LDBIcon:Register(addonName, ldbObject, AST_DB.minimap)
 end
